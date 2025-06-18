@@ -19,7 +19,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             ST42_kadai04Theme {
-                
+
             }
         }
     }
