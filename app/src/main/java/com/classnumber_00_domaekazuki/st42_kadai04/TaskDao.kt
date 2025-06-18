@@ -5,18 +5,23 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface TaskDao {
+    // 非同期ワンショットクエリ
     @Insert
-    fun insertTask(task: Task)
+    suspend fun insertTask(task: Task)
 
+    // オブザーバルクエリ
     @Query("SELECT * FROM Task")
-    fun loadAllTasks() : List<Task>
+    fun loadAllTasks() : Flow<List<Task>>
 
+    // 非同期ワンショットクエリ
     @Update
-    fun updateTask(task: Task)
+    suspend fun updateTask(task: Task)
 
+    // 非同期ワンショットクエリ
     @Delete
-    fun deleteTask(task: Task)
+    suspend fun deleteTask(task: Task)
 }
