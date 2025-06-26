@@ -15,7 +15,7 @@ interface MemoDao {
     @Insert
     // メモオブジェクトを受け取って保存
     suspend fun insert(memo: Memo)
-    
+
     // データを削除する(DELETE)
     // @DeleteはSQL記述しなくてもよい
     @Delete
