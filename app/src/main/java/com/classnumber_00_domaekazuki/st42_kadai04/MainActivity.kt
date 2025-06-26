@@ -107,7 +107,11 @@ fun MemoApp(database : AppDatabase){
 
                     }
                 }
-            ) { }
+            ) {
+                Text(
+                    text = "メモ追加"
+                )
+            }
         }
     }
 }
