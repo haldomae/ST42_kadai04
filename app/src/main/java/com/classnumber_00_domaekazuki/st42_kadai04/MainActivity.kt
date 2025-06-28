@@ -2,16 +2,21 @@ package com.classnumber_00_domaekazuki.st42_kadai04
 
 // MainActivity.kt - ユーザーが見る画面とデータベースをつなぐファイル
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import kotlinx.coroutines.launch
+import androidx.navigation.compose.*
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -22,14 +27,26 @@ class MainActivity : ComponentActivity() {
 
         // 画面を表示
         setContent {
-            MemoApp(database)  // データベースを画面に渡す
+            // 画面遷移のコントローラーを作成
+            val navController = rememberNavController()
+            NavHost(navController = navController, startDestination = "memo") {
+                composable("memo") {
+                    MemoApp(database, navController)
+                }
+                composable("detail/{memoText}") {backStackEntry ->
+                    // 前の画面から渡された引数（データ）を取得する
+                    val memoText = backStackEntry.arguments?.getString("memoText")?.toString()
+                    MemoDetail(navController, memoText.toString())
+                }
+            }
+//            MemoApp(database)  // データベースを画面に渡す
         }
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MemoApp(database: AppDatabase) {
+fun MemoApp(database: AppDatabase, navController: NavController) {
     // 🔍 画面の状態を管理する変数たち
     // memos = 現在表示されているメモのリスト
     var memos by remember { mutableStateOf(listOf<Memo>()) }
@@ -37,11 +54,12 @@ fun MemoApp(database: AppDatabase) {
     var newMemoText by remember { mutableStateOf("") }
     // scope = 非同期処理（データベース操作）を実行するための道具
     val scope = rememberCoroutineScope()
-
     // 🔍 アプリ起動時にデータベースからメモを読み込み
     LaunchedEffect(Unit) {  // アプリ起動時に1回だけ実行
         memos = database.memoDao().getAll()  // データベースから全メモを取得
     }
+
+
 
     // 🔍 画面のレイアウト開始
     Column(
@@ -81,6 +99,7 @@ fun MemoApp(database: AppDatabase) {
                             // 🔍 入力欄をクリア
                             newMemoText = ""
                         }
+
                     }
                 }
             ) {
@@ -97,7 +116,11 @@ fun MemoApp(database: AppDatabase) {
         ) {
             items(memos) { memo ->  // memosリストの各項目に対して
                 Card(  // カード形式で表示
-                    modifier = Modifier.fillMaxWidth()  // 横幅いっぱい
+                    modifier = Modifier
+                        .fillMaxWidth()  // 横幅いっぱい
+                        .clickable{
+                            navController.navigate("detail/${memo.text}")
+                        }
                 ) {
                     Row(
                         modifier = Modifier
@@ -120,6 +143,7 @@ fun MemoApp(database: AppDatabase) {
                                     // 🔍 画面を最新の状態に更新
                                     memos = database.memoDao().getAll()
                                 }
+
                             },
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = MaterialTheme.colorScheme.error  // 赤色
@@ -130,6 +154,22 @@ fun MemoApp(database: AppDatabase) {
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun MemoDetail(navController: NavController, memoText: String){
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Text(memoText)
+        Button(
+            onClick = { navController.popBackStack() }
+        ) {
+            Text("戻る")
         }
     }
 }
