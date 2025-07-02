@@ -8,7 +8,7 @@ import android.content.Context
 // @Database = このクラスがデータベース全体を表すことを宣言
 @Database(
     entities = [Memo::class],  // このデータベースで使うテーブル（Entity）を指定
-    version = 1               // データベースのバージョン番号（変更時に増やす）
+    version = 3               // データベースのバージョン番号（変更時に増やす）
 )
 // RoomDatabase を継承することで、Room の機能を使える
 abstract class AppDatabase : RoomDatabase() {

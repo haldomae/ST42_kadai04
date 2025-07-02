@@ -11,6 +11,11 @@ interface MemoDao {
     @Query("SELECT * FROM memo")  // 「memoテーブルから全部取ってきて」という意味
     suspend fun getAll(): List<Memo>  // 結果はMemoのリストで返される
 
+    // IDから該当のデータを「取得」する操作を追加
+    // :id の部分が引数 id の値に置き換えられる
+    @Query("SELECT * FROM memo WHERE id = :id")
+    suspend fun getTargetMemoData(id: Int): Memo?
+
     // 🔍 データを「保存」する操作
     // @Insert = 新しいデータをテーブルに追加する
     @Insert

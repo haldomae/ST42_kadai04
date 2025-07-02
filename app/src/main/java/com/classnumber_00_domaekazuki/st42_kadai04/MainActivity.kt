@@ -17,6 +17,8 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import kotlinx.coroutines.launch
 import androidx.navigation.compose.*
+import java.text.SimpleDateFormat
+import java.util.*
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -33,10 +35,10 @@ class MainActivity : ComponentActivity() {
                 composable("memo") {
                     MemoApp(database, navController)
                 }
-                composable("detail/{memoText}") {backStackEntry ->
+                composable("detail/{memoId}") {backStackEntry ->
                     // 前の画面から渡された引数（データ）を取得する
-                    val memoText = backStackEntry.arguments?.getString("memoText")?.toString()
-                    MemoDetail(navController, memoText.toString())
+                    val memoId = backStackEntry.arguments?.getString("memoId")?.toIntOrNull()
+                    MemoDetail(navController,database, memoId)
                 }
             }
 //            MemoApp(database)  // データベースを画面に渡す
@@ -119,7 +121,7 @@ fun MemoApp(database: AppDatabase, navController: NavController) {
                     modifier = Modifier
                         .fillMaxWidth()  // 横幅いっぱい
                         .clickable{
-                            navController.navigate("detail/${memo.text}")
+                            navController.navigate("detail/${memo.id}")
                         }
                 ) {
                     Row(
@@ -159,13 +161,72 @@ fun MemoApp(database: AppDatabase, navController: NavController) {
 }
 
 @Composable
-fun MemoDetail(navController: NavController, memoText: String){
+fun MemoDetail(navController: NavController,database: AppDatabase, memoId: Int?){
+//    Column(
+//        modifier = Modifier.fillMaxSize(),
+//        horizontalAlignment = Alignment.CenterHorizontally,
+//        verticalArrangement = Arrangement.Center
+//    ) {
+//        Text(memoText)
+//        Button(
+//            onClick = { navController.popBackStack() }
+//        ) {
+//            Text("戻る")
+//        }
+//    }
+    // State to hold the fetched memo
+    var memo: Memo? by remember { mutableStateOf(null) }
+    val scope = rememberCoroutineScope()
+
+    // Fetch the memo when the screen is composed or memoId changes
+    LaunchedEffect(memoId) {
+        if (memoId != null) {
+            scope.launch {
+                memo = database.memoDao().getTargetMemoData(memoId)
+                if (memo == null) {
+                    // Log an error or navigate back if memo not found
+                    Log.e("MemoDetail", "Memo with ID $memoId not found.")
+                    // Optionally navigate back if the memo doesn't exist
+                    // navController.popBackStack()
+                }
+            }
+        } else {
+            // Handle case where memoId is null (e.g., if navigation argument was missing)
+            Log.e("MemoDetail", "Memo ID is null.")
+            navController.popBackStack() // Go back if no ID is provided
+        }
+    }
+
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Text(memoText)
+        if (memo != null) {
+            // Display Memo Text
+            Text(
+                text = "メモ内容: ${memo!!.text}",
+                style = MaterialTheme.typography.titleLarge,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+
+            // Display Created At timestamp
+            // Format the timestamp (Long) into a readable date string
+            val dateFormat = SimpleDateFormat("yyyy/MM/dd HH:mm:ss", Locale.getDefault())
+            val formattedDate = dateFormat.format(Date(memo!!.createdAt))
+
+            Text(
+                text = "登録日時: $formattedDate",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        } else {
+            // Show a loading or error message while fetching/if not found
+            CircularProgressIndicator() // Or Text("Loading memo...")
+        }
+
+        Spacer(modifier = Modifier.height(24.dp))
+
         Button(
             onClick = { navController.popBackStack() }
         ) {
