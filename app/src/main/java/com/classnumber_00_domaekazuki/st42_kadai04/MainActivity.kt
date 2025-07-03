@@ -56,8 +56,9 @@ class MainActivity : ComponentActivity() {
                     composable("memo") {
                         MemoApp(database, navController)
                     }
-                    composable("detail") {
-                        MemoDetail()
+                    composable("detail/{memoText}") { backStackEntry ->
+                        val memoText = backStackEntry.arguments?.getString("memoText")?.toString()
+                        MemoDetail(memoText.toString())
                     }
                 }
             }
@@ -144,7 +145,7 @@ fun MemoApp(database : AppDatabase, navController: NavController){
                     modifier = Modifier
                         .fillMaxWidth()
                         .clickable{
-                            navController.navigate("detail")
+                            navController.navigate("detail/${memo.text}")
                         }
                 ) {
                     // カード形式で表示
@@ -175,10 +176,10 @@ fun MemoApp(database : AppDatabase, navController: NavController){
 
 // メモ詳細画面
 @Composable
-fun MemoDetail(){
+fun MemoDetail(memoText: String){
     Column() {
         Text(
-            text = "メモ詳細"
+            text = memoText
         )
         Button(
             onClick = {
