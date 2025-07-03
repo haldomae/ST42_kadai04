@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -28,6 +29,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.classnumber_00_domaekazuki.st42_kadai04.ui.theme.ST42_kadai04Theme
 import kotlinx.coroutines.launch
 
@@ -42,14 +47,26 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             ST42_kadai04Theme {
-                MemoApp(database)
+                // 画面遷移のコントローラーを作成
+                val navController = rememberNavController()
+                NavHost(
+                    navController = navController,
+                    startDestination = "memo"
+                    ){
+                    composable("memo") {
+                        MemoApp(database, navController)
+                    }
+                    composable("detail") {
+                        MemoDetail()
+                    }
+                }
             }
         }
     }
 }
 // メモ追加、メモ一覧
 @Composable
-fun MemoApp(database : AppDatabase){
+fun MemoApp(database : AppDatabase, navController: NavController){
     // 画面の状態を管理する変数たち(ViewModelに入れた方がよい)
     // 現在表示されているメモのリスト
     var memos by remember { mutableStateOf(listOf<Memo>()) }
@@ -124,7 +141,11 @@ fun MemoApp(database : AppDatabase){
         LazyColumn {
             items(memos) { memo ->
                 Card(
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable{
+                            navController.navigate("detail")
+                        }
                 ) {
                     // カード形式で表示
                     Row {
