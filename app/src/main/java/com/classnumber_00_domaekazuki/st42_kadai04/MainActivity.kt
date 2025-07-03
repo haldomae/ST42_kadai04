@@ -47,6 +47,7 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
+// メモ追加、メモ一覧
 @Composable
 fun MemoApp(database : AppDatabase){
     // 画面の状態を管理する変数たち(ViewModelに入れた方がよい)
@@ -147,6 +148,25 @@ fun MemoApp(database : AppDatabase){
                     }
                 }
             }
+        }
+    }
+}
+
+// メモ詳細画面
+@Composable
+fun MemoDetail(){
+    Column() {
+        Text(
+            text = "メモ詳細"
+        )
+        Button(
+            onClick = {
+                // メモ一覧に戻る
+            }
+        ) {
+            Text(
+                text = "戻る"
+            )
         }
     }
 }
