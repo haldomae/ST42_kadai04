@@ -134,7 +134,7 @@ fun MemoApp(database: AppDatabase){
                             onClick = {
                                 // メモDaoに入っている削除処理を実行
                                 // 削除処理はMemoオブジェクトを渡してあげる
-                                
+
                                 // 登録処理と同様に表示されているデータを更新
                             }
                         ){
