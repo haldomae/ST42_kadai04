@@ -148,3 +148,20 @@ fun MemoApp(database: AppDatabase){
         }
     }
 }
+
+// メモ詳細画面
+@Composable
+fun MemoDetail(){
+    Column() {
+        Text(
+            text = "メモ詳細"
+        )
+        Button(
+            onClick = {}
+        ) {
+            Text(
+                text = "戻る"
+            )
+        }
+    }
+}
