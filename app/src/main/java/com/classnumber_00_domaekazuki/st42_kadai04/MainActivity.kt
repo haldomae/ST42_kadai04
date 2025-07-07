@@ -128,6 +128,20 @@ fun MemoApp(database: AppDatabase){
                         Text(
                             text = memo.text
                         )
+                        // 削除ボタン
+                        Button(
+                            // ボタンが押された時
+                            onClick = {
+                                // メモDaoに入っている削除処理を実行
+                                // 削除処理はMemoオブジェクトを渡してあげる
+                                
+                                // 登録処理と同様に表示されているデータを更新
+                            }
+                        ){
+                            Text(
+                                text = "削除"
+                            )
+                        }
                     }
                 }
             }
